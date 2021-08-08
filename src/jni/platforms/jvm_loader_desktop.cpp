@@ -1,9 +1,9 @@
-#include "jvm_loader.h"
+#include "modules/kotlin_jvm/src/jni/jvm_loader.h"
 
 #include <core/os/os.h>
 #include <core/project_settings.h>
 
-#ifndef __ANDROID__
+#if defined WINDOWS_ENABLED || defined X11_ENABLED || defined OSX_ENABLED
 
 void* jni::JvmLoader::jvmLib{nullptr};
 

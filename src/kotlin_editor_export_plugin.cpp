@@ -16,8 +16,11 @@ void KotlinEditorExportPlugin::_export_begin(const Set<String>& p_features, bool
     Vector<String> files_to_add;
 
     bool is_graal_only{false};
+    bool is_ios_export{p_features.has("iOS")};
     bool is_android_export{p_features.has("Android")};
-    if (is_android_export) {
+    if (is_ios_export) {
+        _generate_export_configuration_file(jni::Jvm::GRAAL_NATIVE_IMAGE);
+    } else if (is_android_export) {
         files_to_add.push_back("res://build/libs/main-dex.jar");
         files_to_add.push_back("res://build/libs/godot-bootstrap-dex.jar");
         _generate_export_configuration_file(jni::Jvm::ART);
@@ -72,7 +75,7 @@ void KotlinEditorExportPlugin::_export_begin(const Set<String>& p_features, bool
     }
 
     // Copy JRE for desktop platforms
-    if (!is_android_export && !is_graal_only) {
+    if (!is_android_export && !is_graal_only && !is_ios_export) {
         const Vector<String>& path_split = p_path.split("/");
         String export_dir{p_path.replace(path_split[path_split.size() - 1], "")};
         Error error;

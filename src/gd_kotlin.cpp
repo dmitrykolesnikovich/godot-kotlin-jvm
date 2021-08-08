@@ -150,6 +150,8 @@ void GDKotlin::init() {
     String jvm_type_argument{
 #ifdef __ANDROID__
             "art"
+#elif defined IPHONE_ENABLED
+            GdKotlinConfiguration::graal_native_image_string_identifier
 #else
             ""
 #endif
@@ -170,6 +172,8 @@ void GDKotlin::init() {
             _split_jvm_debug_argument(cmd_arg, jvm_type_argument);
 #ifdef __ANDROID__
             LOG_WARNING("You're running android, will use ART.")
+#elif IPHONE_ENABLED
+            LOG_WARNING("You're running ios, will use graal native-image.")
 #endif
         } else if (cmd_arg.find("--jvm-debug-port") >= 0) {
             if (_split_jvm_debug_argument(cmd_arg, jvm_debug_port) == OK) {
@@ -245,8 +249,9 @@ void GDKotlin::init() {
         LOG_VERBOSE(vformat("Started JMX on port: %s", jvm_jmx_port))
 #endif
     }
-
-#ifndef __ANDROID__
+#ifdef IPHONE_ENABLED
+    configuration.set_vm_type(jni::Jvm::GRAAL_NATIVE_IMAGE);
+#elif !defined(__ANDROID__)
     if (jvm_type_argument == GdKotlinConfiguration::jvm_string_identifier) {
         configuration.set_vm_type(jni::Jvm::JVM);
     }
