@@ -1,24 +1,10 @@
 package godot.runtime
 
 import godot.core.KtClass
-import godot.core.KtObject
 import godot.core.TypeManager
 import godot.registration.ClassRegistry
 import godot.registration.Entry
 import godot.util.err
-import godot.util.info
-import godot.util.warning
-import java.io.File
-import java.net.URL
-import java.net.URLClassLoader
-import java.nio.file.FileSystems
-import java.nio.file.Paths
-import java.nio.file.StandardWatchEventKinds
-import java.nio.file.WatchService
-import java.util.*
-import java.util.concurrent.Executors
-import java.util.concurrent.ScheduledExecutorService
-import java.util.concurrent.TimeUnit
 
 
 internal class Bootstrap {
@@ -27,7 +13,7 @@ internal class Bootstrap {
     fun init() {
         registry = ClassRegistry()
         try {
-            val entryFile = Class.forName("godot.Entry").declaredConstructors.first().newInstance() as Entry
+            val entryFile = Class.forName("godot.Entry").getDeclaredConstructor().newInstance() as Entry
 
             with(entryFile) {
                 val context = Entry.Context(registry!!)
