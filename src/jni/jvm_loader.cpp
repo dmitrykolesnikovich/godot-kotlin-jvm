@@ -1,4 +1,5 @@
 #include "jvm_loader.h"
+#include "jni_constants.h"
 
 #include <core/os/os.h>
 #include <core/project_settings.h>
@@ -79,11 +80,11 @@ String jni::JvmLoader::get_path_to_locally_installed_jvm() {
     String pathToLocallyInstalledJvmLib{javaHome + FILE_SEPARATOR + LIB_JVM_RELATIVE_PATH};
 
 #ifdef DEBUG_ENABLED
-    LOG_VERBOSE(vformat("Godot-JVM: Trying to use locally installed jdk at %s", pathToLocallyInstalledJvmLib))
+    LOG_VERBOSE(vformat("Trying to use locally installed jdk at %s", pathToLocallyInstalledJvmLib))
 #endif
 
     if (!FileAccess::exists(pathToLocallyInstalledJvmLib)) {
-        LOG_ERROR(vformat("Godot-JVM: No jvm found at %s! Exiting...", pathToLocallyInstalledJvmLib))
+        LOG_ERROR(vformat("No jvm found at %s! Exiting...", pathToLocallyInstalledJvmLib))
         exit(1);
     }
     return pathToLocallyInstalledJvmLib;
@@ -101,7 +102,22 @@ String jni::JvmLoader::get_embedded_jre_path() {
         };
         jre_path = vformat("%s%s", user_code_dir, LIB_GRAAL_VM_RELATIVE_PATH);
     } else {
-        jre_path = vformat("res://jre/%s", LIB_JVM_RELATIVE_PATH);
+        String jre_folder{
+#ifdef TARGET_OS_MAC
+#ifdef __arm64__
+            JniConstants::JRE_ARM64
+#else
+            JniConstants::JRE_AMD64
+#endif
+#else
+            JniConstants::JRE_AMD64
+#endif
+        };
+#if defined(TARGET_OS_MAC) && !defined(TOOLS_ENABLED)
+        return OS::get_singleton()->get_executable_path().get_base_dir().plus_file(LIB_JVM_RELATIVE_PATH);
+#else
+        jre_path = vformat("res://%s/%s", jre_folder, LIB_JVM_RELATIVE_PATH);
+#endif
     }
     return ProjectSettings::get_singleton()->globalize_path(jre_path);
 }

@@ -16,7 +16,11 @@
 #elif __APPLE__
 #include <TargetConditionals.h>
     #if TARGET_OS_MAC
-        #define LIB_JVM_RELATIVE_PATH "lib/server/libjvm.dylib"
+        #ifdef TOOLS_ENABLED
+            #define LIB_JVM_RELATIVE_PATH "lib/server/libjvm.dylib"
+        #else
+            #define LIB_JVM_RELATIVE_PATH "../Frameworks/libjvm.dylib"
+        #endif
         #define LIB_GRAAL_VM_RELATIVE_PATH "usercode.dylib"
         #define FILE_SEPARATOR "/"
     #endif
